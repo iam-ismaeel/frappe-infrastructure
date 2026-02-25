@@ -1,0 +1,24 @@
+name: Build ERPNext Image
+
+on:
+  repository_dispatch:
+    types: [app-updated]
+
+  push:
+    paths:
+      - apps.json
+      - Containerfile
+      - pwd.yaml
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image with apps.json
+        run: docker build -t ismail55/frappe-custom:${{ github.sha }} .
+
+      - name: Push image
+        run: docker push ismail55/frappe-custom:${{ github.sha }}

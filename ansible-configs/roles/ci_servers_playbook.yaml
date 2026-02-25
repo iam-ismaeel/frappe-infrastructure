@@ -1,0 +1,33 @@
+---
+- name: Installation of jenkins
+  hosts: jenkins
+  become: yes
+  become_user: root
+  roles:
+    - jenkins
+ 
+- name: Installation of sonarqube
+  hosts: sonarqube
+  become: yes
+  become_user: root
+  roles:
+    - sonarqube
+
+- name: Installation of nexus
+  hosts: nexus
+  become: yes
+  become_user: root
+  roles:
+    - nexus
+ 
+
+ - hosts: erpnext
+  become: yes
+
+  roles:
+    - docker
+    - frappe
+    - security
+ 
+
+  

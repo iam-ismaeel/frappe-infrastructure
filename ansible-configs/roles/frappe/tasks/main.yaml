@@ -1,0 +1,12 @@
+- name: Copy frappe stack
+  copy:
+    src: ../../docker/
+    dest: /opt/frappe
+    owner: ubuntu
+    group: ubuntu
+
+- name: Start frappe
+  become_user: ubuntu
+  shell: docker compose -f pwd.yml up -d
+  args:
+    chdir: /opt/frappe
