@@ -9,16 +9,42 @@ on:
       - apps.json
       - Containerfile
       - pwd.yaml
+      
+permissions:
+  id-token: write   # Required for OIDC
+  contents: read    # Required for checkout
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
+      # Step 1: Configure AWS credentials using your IAM role
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::046651569857:policy/gha-aws-ecr-policies
+          aws-region: us-east-1
+
+      # Step 2: Login to Amazon ECR
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # Step 3: Build and push Docker image
       - name: Build image with apps.json
-        run: docker build -t ismail55/frappe-custom:${{ github.sha }} .
+        run:  docker build \
+              --build-arg=FRAPPE_PATH=https://github.com/frappe/frappe \
+              --build-arg=FRAPPE_BRANCH=version-15 \
+              --build-arg=PYTHON_VERSION=3.11.9 \
+              --build-arg=NODE_VERSION=20.11.1 \
+              --build-arg=APPS_JSON_BASE64=$APPS_JSON_BASE64 \
+              --tag=046651569857.dkr.ecr.us-east-1.amazonaws.com/frappe/frappe-custom:${{ github.sha }} \
+              --file=Dockerfile .
+        
 
       - name: Push image
-        run: docker push ismail55/frappe-custom:${{ github.sha }}
+        run: docker push 046651569857.dkr.ecr.us-east-1.amazonaws.com/frappe/frappe-custom:${{ github.sha }}
