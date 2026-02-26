@@ -36,14 +36,15 @@ jobs:
 
       # Step 3: Build and push Docker image
       - name: Build image with apps.json
-        run:  docker build \
+        run:  |
+            docker build \
               --build-arg=FRAPPE_PATH=https://github.com/frappe/frappe \
               --build-arg=FRAPPE_BRANCH=version-15 \
               --build-arg=PYTHON_VERSION=3.11.9 \
               --build-arg=NODE_VERSION=20.11.1 \
               --build-arg=APPS_JSON_BASE64=$APPS_JSON_BASE64 \
-              --tag=046651569857.dkr.ecr.us-east-1.amazonaws.com/frappe/frappe-custom:${{ github.sha }} \
-              --file=Dockerfile .
+              --tag 046651569857.dkr.ecr.us-east-1.amazonaws.com/frappe/frappe-custom:${{ github.sha }} \
+              --file Dockerfile .
         
 
       - name: Push image
