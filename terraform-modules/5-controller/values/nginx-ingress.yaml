@@ -1,0 +1,13 @@
+---
+controller:
+  ingressClassResource:
+    name: external-nginx
+  service:
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-type: external #we will use aws lbc to create nlb for the nginx ingress(external indicates that, the lb to becreated has to be internet facing(publicly accessible) and not internal(accessible within vpc))
+      service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip #because we want to use ip mode as our target group for the nginx ingress controller.
+      service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing  #we want this load balancer to have a publicly routable ip address.
+  image:
+    tag: v1.12.1
+
+      

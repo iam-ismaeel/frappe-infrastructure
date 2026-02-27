@@ -1,0 +1,15 @@
+# This yaml file contain our argocd configurations.
+---
+global:                # Global setting for argocd,i.e applying to all argocd instance 
+  image:                #The argocd image tag version as at then. 
+    tag: "v2.6.6"    
+
+server:               #The following 
+  extraArgs:
+    - --insecure     # to expose argocd outside,you would use ingress and terminate
+                     # https on the ingress leveland then route plain http to argocd
+
+# for aws
+configs:     
+  params: 
+  server.insecure: true

@@ -1,6 +1,6 @@
 services:
   backend:
-    image: ismail55/frappe-custom:1.0.0
+    image: 046651569857.dkr.ecr.us-east-1.amazonaws.com/frappe/frappe-custom:fc97cadf3af017e3ba85f5da14f17f462ae0e378
     networks:
       - frappe_network
     deploy:
@@ -25,7 +25,7 @@ services:
       MARIADB_ROOT_PASSWORD: admin
 
   configurator:
-    image: ismail55/frappe-custom:1.0.0
+    image: 046651569857.dkr.ecr.us-east-1.amazonaws.com/frappe/frappe-custom:fc97cadf3af017e3ba85f5da14f17f462ae0e378
     networks:
       - frappe_network
     deploy:
@@ -54,7 +54,7 @@ services:
       - logs:/home/frappe/frappe-bench/logs
 
   create-site:
-    image: ismail55/frappe-custom:1.0.0
+    image: 046651569857.dkr.ecr.us-east-1.amazonaws.com/frappe/frappe-custom:fc97cadf3af017e3ba85f5da14f17f462ae0e378
     networks:
       - frappe_network
     deploy:
@@ -87,7 +87,7 @@ services:
           fi
         done;
         echo "sites/common_site_config.json found";
-        bench new-site --mariadb-user-host-login-scope='%' --admin-password=admin --db-root-username=root --db-root-password=admin --install-app erpnext --set-default frontend;
+        bench new-site --mariadb-user-host-login-scope='%' --admin-password=admin --db-root-username=root --db-root-password=admin --install-app erpnext  --install-app ismail_app --set-default frontend;
 
   db:
     image: mariadb:10.6
@@ -113,7 +113,7 @@ services:
       - db-data:/var/lib/mysql
 
   frontend:
-    image: ismail55/frappe-custom:1.0.0
+    image: 046651569857.dkr.ecr.us-east-1.amazonaws.com/frappe/frappe-custom:fc97cadf3af017e3ba85f5da14f17f462ae0e378
     networks:
       - frappe_network
     depends_on:
@@ -143,7 +143,7 @@ services:
       - "8080:8080"
 
   queue-long:
-    image: ismail55/frappe-custom:1.0.0
+    image: 046651569857.dkr.ecr.us-east-1.amazonaws.com/frappe/frappe-custom:fc97cadf3af017e3ba85f5da14f17f462ae0e378
     networks:
       - frappe_network
     deploy:
@@ -162,7 +162,7 @@ services:
       FRAPPE_REDIS_QUEUE: redis://redis-queue:6379
 
   queue-short:
-    image: ismail55/frappe-custom:1.0.0
+    image: 046651569857.dkr.ecr.us-east-1.amazonaws.com/frappe/frappe-custom:fc97cadf3af017e3ba85f5da14f17f462ae0e378
     networks:
       - frappe_network
     deploy:
@@ -201,7 +201,7 @@ services:
         condition: on-failure
 
   scheduler:
-    image: ismail55/frappe-custom:1.0.0
+    image: 046651569857.dkr.ecr.us-east-1.amazonaws.com/frappe/frappe-custom:fc97cadf3af017e3ba85f5da14f17f462ae0e378
     networks:
       - frappe_network
     deploy:
@@ -215,7 +215,7 @@ services:
       - logs:/home/frappe/frappe-bench/logs
 
   websocket:
-    image: ismail55/frappe-custom:1.0.0
+    image: 046651569857.dkr.ecr.us-east-1.amazonaws.com/frappe/frappe-custom:fc97cadf3af017e3ba85f5da14f17f462ae0e378
     networks:
       - frappe_network
     deploy:
