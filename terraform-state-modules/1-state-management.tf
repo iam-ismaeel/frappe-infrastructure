@@ -1,16 +1,16 @@
-provider "aws" {
-  region  = "us-east-1"
-  profile = "ismail"
-}
-
 resource "aws_s3_bucket" "terraform_state" {
   bucket = var.s3_bucket_name
-  versioning {
-    enabled = true
+}
+
+resource "aws_s3_bucket_versioning" "terraform_state" {
+  bucket = aws_s3_bucket.terraform_state.id
+
+  versioning_configuration {
+    status = "Enabled"
   }
 }
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "example" {
+resource "aws_s3_bucket_server_side_encryption_configuration" "terraform_state" {
   bucket = aws_s3_bucket.terraform_state.id
 
   rule {

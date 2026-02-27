@@ -1,9 +1,13 @@
 variable "s3_bucket_name" {
   description = "S3 backend for state storage"
-  type = list(string)
+  type = string
 }
 variable "dynamodb_name" {
   description = "State management"
-  type = list(string)
+  type = string
 }
 
+variable "region" {
+    description = "aws region"
+    type string
+}
