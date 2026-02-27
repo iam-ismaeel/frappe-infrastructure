@@ -9,5 +9,5 @@ variable "dynamodb_name" {
 
 variable "region" {
     description = "aws region"
-    type string
+    type   =  string
 }
