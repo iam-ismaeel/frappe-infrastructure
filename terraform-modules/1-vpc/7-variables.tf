@@ -41,9 +41,6 @@ variable "nat_gateway_count" {
   default = 1 
 }
 
-variable "az_subnets" {
-  type    = list(string)
-}
 
 
 
