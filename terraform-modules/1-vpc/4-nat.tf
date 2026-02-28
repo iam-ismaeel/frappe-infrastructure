@@ -1,9 +1,10 @@
 #create an elastic ip for the purpose of our NAT gateway
 resource "aws_eip" "this" {
+  count = 2
   domain = "vpc"
 
   tags = {
-    Name = "${var.env}-nat"
+       Name = "${var.env} eip-${count.index}"
   }
 }
 
