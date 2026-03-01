@@ -64,7 +64,7 @@ resource "helm_release" "aws_lbc" {
         value = "us-east-1"
     }  
 
- depends_on = [helm_release.cluster_autoscaler]     #you can as well use aws_eks_node_group.general to deploy multiple helm charts in parallel
+      #you can as well use aws_eks_node_group.general to deploy multiple helm charts in parallel
  }
 
  #we still need to create an IAM policy json file,to dynamically add a resource contraints,you would probaby add a template 

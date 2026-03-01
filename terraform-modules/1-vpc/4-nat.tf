@@ -12,7 +12,7 @@ resource "aws_eip" "this" {
 resource "aws_nat_gateway" "this" {
   count = var.nat_gateway_count
   allocation_id = aws_eip.this[count.index].id
-  subnet_id = var.az_public_subnet[count.index]
+  subnet_id = aws_subnet.az_public_subnet[count.index].id
 
   tags = {
     Name = "${var.env}-nat"
