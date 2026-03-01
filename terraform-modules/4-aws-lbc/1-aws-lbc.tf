@@ -48,22 +48,23 @@ resource "helm_release" "aws_lbc" {
     namespace  = "kube-system"
     version    = "1.8.1"
 
-    set {
+    set =[ 
+        {
         name = "clusterName"
         value = "${var.cluster_name}"
-    }  
+    } ,
 
-    set {
+    {
         name = "serviceAccount.name"
         value = "aws-load-balancer-controller"
-    }  
+    },  
 #This must match your region
 
-     set {
+    {
         name = "awsRegion"
         value = "us-east-1"
     }  
-
+    ]
       #you can as well use aws_eks_node_group.general to deploy multiple helm charts in parallel
  }
 

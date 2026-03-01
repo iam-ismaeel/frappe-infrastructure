@@ -42,10 +42,12 @@ resource "helm_release" "updater" {
     version                = "0.11.0"
 #To override the variables,we can either use the set block to set the variables individually or use yaml file.
  #in this case,we are making use of the yaml set file to do that.
-  /*  set {
+  /*  set = [ 
+    {
         name = "args[0]"
         value = "--kubelet-insecure-tls"
-    }  */
+    }  
+  ]*/
  values = [file("values/image-updater.yaml")]
 
  depends_on = [helm_release.argocd]
