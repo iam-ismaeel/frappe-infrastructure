@@ -42,7 +42,7 @@ spec:
             --db-root-username=root \
             --db-root-password=admin \
             --db-name=erpnext \
-            --db-password="Olamilekan9#" \
+            --db-password=fgjhkjljkliuy \
             --install-app erpnext
             fi
 
@@ -53,7 +53,7 @@ spec:
             --db-root-username=root \
             --db-root-password=admin \
             --db-name=payment
-            --db-password="Olamilekan9#" \
+            --db-password=fghjklbdhhsjjsk \
             --install-app erpnext \
             --install-app payment
             fi
