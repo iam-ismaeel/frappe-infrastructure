@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: queue-short
+  namespace: frappe
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: queue-short
+  template:
+    metadata:
+      labels:
+        app: queue-short
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+      - name: worker
+        image: 046651569857.dkr.ecr.us-east-1.amazonaws.com/frappe/frappe-custom:fc97cadf3af017e3ba85f5da14f17f462ae0e378
+        command: ["bench", "worker", "--queue", "short,default"]
+        env:
+        - name: FRAPPE_REDIS_CACHE
+          valueFrom:
+            configMapKeyRef:
+              name: frappe-config
+              key: REDIS_CACHE
+        - name: FRAPPE_REDIS_QUEUE
+          valueFrom:
+            configMapKeyRef:
+              name: frappe-config
+              key: REDIS_QUEUE
+        volumeMounts:
+        - name: sites
+          mountPath: /home/frappe/frappe-bench/sites
+        - name: logs
+          mountPath: /home/frappe/frappe-bench/logs
+      volumes:
+      - name: sites
+        persistentVolumeClaim:
+          claimName: sites-pvc
+      - name: logs
+        persistentVolumeClaim:
+          claimName: logs-pvc

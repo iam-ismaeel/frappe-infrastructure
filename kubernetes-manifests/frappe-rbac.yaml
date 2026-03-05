@@ -1,0 +1,35 @@
+# rbac/service-account.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: frappe-sa
+  namespace: frappe
+---
+# rbac/role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: frappe-role
+  namespace: frappe
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "configmaps", "secrets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "statefulsets"]
+  verbs: ["get", "list", "watch"]
+---
+# rbac/role-binding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: frappe-role-binding
+  namespace: frappe
+subjects:
+- kind: ServiceAccount
+  name: frappe-sa
+  namespace: frappe
+roleRef:
+  kind: Role
+  name: frappe-role
+  apiGroup: rbac.authorization.k8s.io

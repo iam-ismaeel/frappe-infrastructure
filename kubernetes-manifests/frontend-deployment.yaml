@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: frappe
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend    
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000  
+      containers:
+      - name: frontend
+        image: 046651569857.dkr.ecr.us-east-1.amazonaws.com/frappe/frappe-custom:fc97cadf3af017e3ba85f5da14f17f462ae0e378
+        command: ["nginx-entrypoint.sh"]
+        ports:
+        - containerPort: 8080
+        env:
+        - name: BACKEND
+          valueFrom:
+            configMapKeyRef:
+              name: frappe-config
+              key: BACKEND
+        - name: SOCKETIO
+          valueFrom:
+            configMapKeyRef:
+              name: frappe-config
+              key: SOCKETIO
+        - name: FRAPPE_SITE_NAME_HEADER
+          valueFrom:
+            configMapKeyRef:
+              name: frappe-config
+              key: FRAPPE_SITE_NAME_HEADER
+        - name: UPSTREAM_REAL_IP_ADDRESS
+          valueFrom:
+            configMapKeyRef:
+              name: frappe-config
+              key: UPSTREAM_REAL_IP_ADDRESS
+        - name: UPSTREAM_REAL_IP_HEADER
+          valueFrom:
+            configMapKeyRef:
+              name: frappe-config
+              key: UPSTREAM_REAL_IP_HEADER
+        - name: UPSTREAM_REAL_IP_RECURSIVE
+          valueFrom:
+            configMapKeyRef:
+              name: frappe-config
+              key: UPSTREAM_REAL_IP_RECURSIVE
+        - name: PROXY_READ_TIMEOUT
+          valueFrom:
+            configMapKeyRef:
+              name: frappe-config
+              key: PROXY_READ_TIMEOUT
+        - name: CLIENT_MAX_BODY_SIZE
+          valueFrom:
+            configMapKeyRef:
+              name: frappe-config
+              key: CLIENT_MAX_BODY_SIZE
+        volumeMounts:
+        - name: sites
+          mountPath: /home/frappe/frappe-bench/sites
+        - name: logs
+          mountPath: /home/frappe/frappe-bench/logs
+        - name: nginx-config
+          mountPath: /nginx-entrypoint.sh
+          subPath: nginx-entrypoint.sh
+      volumes:
+      - name: sites
+        persistentVolumeClaim:
+          claimName: sites-pvc
+      - name: logs
+        persistentVolumeClaim:
+          claimName: logs-pvc
+      - name: nginx-config
+        configMap:
+          name: nginx-config
+          defaultMode: 0755

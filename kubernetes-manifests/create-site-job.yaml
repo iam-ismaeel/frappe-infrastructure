@@ -1,0 +1,77 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-site
+  namespace: frappe
+spec:
+  template:
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      restartPolicy: Never
+      containers:
+      - name: create-site
+        image: 046651569857.dkr.ecr.us-east-1.amazonaws.com/frappe/frappe-custom:fc97cadf3af017e3ba85f5da14f17f462ae0e378
+        command: ["bash", "-c"]
+        args:
+          - |
+            wait-for-it -t 120 mariadb:3306;
+            wait-for-it -t 120 redis-cache:6379;
+            wait-for-it -t 120 redis-queue:6379;
+            export start=`date +%s`;
+            until [[ -n `grep -hs ^ sites/common_site_config.json | jq -r ".db_host // empty"` ]] && \
+              [[ -n `grep -hs ^ sites/common_site_config.json | jq -r ".redis_cache // empty"` ]] && \
+              [[ -n `grep -hs ^ sites/common_site_config.json | jq -r ".redis_queue // empty"` ]];
+            do
+              echo "Waiting for sites/common_site_config.json to be created";
+              sleep 5;
+              if (( `date +%s`-start > 120 )); then
+                echo "could not find sites/common_site_config.json with required keys";
+                exit 1
+              fi
+            done;
+            echo "sites/common_site_config.json found";
+           
+
+            if [ ! -d "sites/erpnext.azanyinc.com" ]; then
+            bench new-site erpnext.azanyinc.com \
+            --mariadb-user-host-login-scope='%' \
+            --admin-password=admin \
+            --db-root-username=root \
+            --db-root-password=admin \
+            --db-name=erpnext \
+            --db-password="Olamilekan9#" \
+            --install-app erpnext
+            fi
+
+            if [ ! -d "sites/payment.azanyinc.com" ]; then
+            bench new-site payment.azanyinc.com \
+            --mariadb-user-host-login-scope='%' \
+            --admin-password=admin \
+            --db-root-username=root \
+            --db-root-password=admin \
+            --db-name=payment
+            --db-password="Olamilekan9#" \
+            --install-app erpnext \
+            --install-app payment
+            fi
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: MYSQL_ROOT_PASSWORD
+        volumeMounts:
+        - name: sites
+          mountPath: /home/frappe/frappe-bench/sites
+        - name: logs
+          mountPath: /home/frappe/frappe-bench/logs
+      volumes:
+      - name: sites
+        persistentVolumeClaim:
+          claimName: sites-pvc
+      - name: logs
+        persistentVolumeClaim:
+          claimName: logs-pvc

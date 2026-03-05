@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: websocket
+  namespace: frappe
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: websocket
+  template:
+    metadata:
+      labels:
+        app: websocket
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+      - name: websocket
+        image: 046651569857.dkr.ecr.us-east-1.amazonaws.com/frappe/frappe-custom:fc97cadf3af017e3ba85f5da14f17f462ae0e378
+        command: ["node", "/home/frappe/frappe-bench/apps/frappe/socketio.js"]
+        ports:
+        - containerPort: 9000
+        env:
+        - name: FRAPPE_REDIS_CACHE
+          valueFrom:
+            configMapKeyRef:
+              name: frappe-config
+              key: REDIS_CACHE
+        - name: FRAPPE_REDIS_QUEUE
+          valueFrom:
+            configMapKeyRef:
+              name: frappe-config
+              key: REDIS_QUEUE
+        volumeMounts:
+        - name: sites
+          mountPath: /home/frappe/frappe-bench/sites
+        - name: logs
+          mountPath: /home/frappe/frappe-bench/logs
+        livenessProbe:
+          tcpSocket:
+            port: 9000
+          initialDelaySeconds: 60
+          periodSeconds: 15
+          timeoutSeconds: 5
+
+        readinessProbe:
+          tcpSocket:
+            port: 9000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1"
+      volumes:
+      - name: sites
+        persistentVolumeClaim:
+          claimName: sites-pvc
+      - name: logs
+        persistentVolumeClaim:
+          claimName: logs-pvc

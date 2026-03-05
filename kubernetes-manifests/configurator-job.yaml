@@ -1,0 +1,72 @@
+# jobs/configurator-job.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: configurator
+  namespace: frappe
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "1"
+spec:
+  template:
+    spec:
+      securityContext:
+       runAsUser: 1000
+       runAsGroup: 1000
+       fsGroup: 1000
+      containers:
+      - name: configurator
+        image: 046651569857.dkr.ecr.us-east-1.amazonaws.com/frappe/frappe-custom:fc97cadf3af017e3ba85f5da14f17f462ae0e378
+        command: ["bash", "-c"]
+        args:
+          - |
+           cat > /home/frappe/frappe-bench/sites/common_site_config.json <<EOF
+           {
+           "db_host": "${DB_HOST}",
+           "db_port": ${DB_PORT},
+           "redis_cache": "redis://${REDIS_CACHE}",
+           "redis_queue": "redis://${REDIS_QUEUE}",
+           "redis_socketio": "redis://${REDIS_QUEUE}",
+           "socketio_port": ${SOCKETIO_PORT}
+           }
+           EOF
+           echo "common_site_config.json created"
+        env:
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: frappe-config
+              key: DB_HOST
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: frappe-config
+              key: DB_PORT
+        - name: REDIS_CACHE
+          valueFrom:
+            configMapKeyRef:
+              name: frappe-config
+              key: REDIS_CACHE
+        - name: REDIS_QUEUE
+          valueFrom:
+            configMapKeyRef:
+              name: frappe-config
+              key: REDIS_QUEUE
+        - name: SOCKETIO_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: frappe-config
+              key: SOCKETIO_PORT
+        volumeMounts:
+        - name: sites
+          mountPath: /home/frappe/frappe-bench/sites
+        - name: logs
+          mountPath: /home/frappe/frappe-bench/logs
+      restartPolicy: Never
+      volumes:
+      - name: sites
+        persistentVolumeClaim:
+          claimName: sites-pvc
+      - name: logs
+        persistentVolumeClaim:
+          claimName: logs-pvc

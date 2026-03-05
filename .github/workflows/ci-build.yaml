@@ -34,6 +34,11 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
+      - name: Encode apps.json
+        run: |
+             echo "APPS_JSON_BASE64=$(base64 -w 0 apps.json)" >> $GITHUB_ENV
+
+
       # Step 3: Build and push Docker image
       - name: Build image with apps.json
         run:  |
@@ -42,7 +47,7 @@ jobs:
               --build-arg=FRAPPE_BRANCH=version-15 \
               --build-arg=PYTHON_VERSION=3.11.9 \
               --build-arg=NODE_VERSION=20.11.1 \
-              --build-arg=APPS_JSON_BASE64=$APPS_JSON_BASE64 \
+              --build-arg=APPS_JSON_BASE64=${{ env.APPS_JSON_BASE64 }} \
               --tag 046651569857.dkr.ecr.us-east-1.amazonaws.com/frappe/frappe-custom:${{ github.sha }} \
               --file Dockerfile .
         

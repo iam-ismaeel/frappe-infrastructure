@@ -1,0 +1,27 @@
+# network-policies/frappe-network-policy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: frappe-network-policy
+  namespace: frappe
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: frappe
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: frappe
+    ports:
+    - port: 3306  # MariaDB
+    - port: 6379  # Redis
+    - port: 8000  # Backend
+    - port: 8080  # Frontend
+    - port: 9000  # Websocket
